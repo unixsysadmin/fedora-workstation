@@ -1,0 +1,8 @@
+*.retry
+.*.swp
+.*.swo
+.DS_Store
+.vscode
+*.pychosts.*
+!!inventory/hosts.default
+.vault-password-file

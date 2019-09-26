@@ -1,0 +1,5 @@
+[all:vars]
+fedora_environment=default
+
+[all]
+localhost

@@ -1,0 +1,108 @@
+---
+
+- hosts: all
+  become: True
+
+  handlers:
+    - include: handlers/main.yml
+
+  vars:
+    username: stemid
+    home: /home/stemid
+
+    backup_username: backup
+    backup_password: secret.
+
+    packages:
+      - tmux
+      - nmap
+      - tcpdump
+      - vim-enhanced
+      - autofs
+      - libvirt
+      - virt-manager
+      - gnome-tweaks
+      - pidgin
+      - evolution
+      - firefox-wayland
+      - python3-tmuxp
+      - nfs-utils
+      - cifs-utils
+      - redis
+      - ansible
+
+    directories:
+      - path: "{{ home }}/src"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0750"
+      - path: /media/nas
+        owner: root
+        group: root
+        mode: "0755"
+
+    repos:
+      - src: https://github.com/Anthony25/gnome-terminal-colors-solarized
+        dest: "{{ home }}/src/gnome-terminal-colors-solarized"
+      - src: https://github.com/tmux-plugins/tmux-resurrect.git
+        dest: "{{ home }}/src/tmux-resurrect.git"
+
+    config_files:
+      - src: tmux.conf
+        dest: "{{ home }}/.tmux.conf"
+      - src: vimrc
+        dest: "{{ home }}/.vimrc"
+      - src: ansible.cfg
+        dest: "{{ home }}/.ansible.cfg"
+      - src: bashrc
+        dest: "{{ home }}/.bashrc"
+
+  vars_files:
+    - "vars/{{ fedora_environment | default('default') }}.yml"
+
+  tasks:
+    - name: install packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ packages }}"
+
+    - name: create directories
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      with_items: "{{ directories }}"
+
+    - include: tasks/setup-autofs.yml
+
+    - name: install config files
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+      with_items: "{{ config_files }}"
+
+    - name: clone git repos
+      git:
+        repo: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        accept_hostkey: yes
+      with_items: "{{ repos }}"
+
+    - name: reset permissions on git repos
+      file:
+        path: "{{ item.dest }}"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+      with_items: "{{ repos }}"
+
+    - name: ensure redis is started
+      service:
+        name: redis
+        state: started
+        enabled: yes

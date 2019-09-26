@@ -1,0 +1,18 @@
+- name: install autofs nas config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - src: auto.nas
+      dest: /etc/auto.nas
+    - src: nas.autofs
+      dest: /etc/auto.master.d/nas.autofs
+  notify: restart autofs
+
+- name: install autofs nas credentials
+  template:
+    src: nas.backups.creds
+    dest: /etc/nas.backups.creds
+    mode: 0600
+  notify: restart autofs
+

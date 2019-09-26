@@ -1,0 +1,70 @@
+" Global defaults
+set autoindent
+set ts=2
+set sw=2
+set expandtab
+set backspace=indent,eol,start
+set wrap
+set linebreak
+filetype plugin indent on
+set history=9001
+set encoding=utf-8
+
+set background=dark
+syntax enable
+colorscheme solarized8
+
+" Flag superfluous whitespace for Python. Does not work 2019-05-28.
+"au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+
+" Bind F1 to :bd. Inspired by ZZ
+map <F1> :bd
+
+" Disable any code folding
+set nofoldenable
+
+" It's 2012 ffs
+set nocompatible
+
+" Never used them, only vulnerable pos
+set modelines=0
+
+" Taboo plugin config
+let g:taboo_tab_format=" %N [../%P/]%m"
+
+" Svärje!
+if has("multi_byte")
+	set encoding=utf-8
+	language sv_SE.UTF-8
+	set fileencoding=UTF-8
+endif
+
+" Reload syntax highlighting when pressing Space+r in normal mode
+nmap <Space>r :syn sync fromstart<CR>
+
+" Attempt to highlight unwanted spaces
+:highlight ExtraWhitespace ctermbg=red guibg=red
+" The following alternative may be less obtrusive.
+:highlight ExtraWhitespace ctermbg=darkgreen guibg=lightgreen
+" Try the following if your GUI uses a dark background.
+:highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+
+" Show trailing whitespace:
+:match ExtraWhitespace /\s\+$/
+
+" Show trailing whitespace and spaces before a tab:
+:match ExtraWhitespace /\s\+$\| \+\ze\t/
+
+" Show tabs that are not at the start of a line:
+":match ExtraWhitespace /[^\t]\zs\t\+/
+
+" Show spaces used for indenting (so you use only tabs for indenting).
+":match ExtraWhitespace /^\t*\zs \+/
+
+" Switch off :match highlighting.
+":match
+" END of highlighting spaces
+
+" Alias :term to :term ++curwin så it's always by default running commands
+" in the currently focused window.
+cnoreabbrev term term ++curwin

@@ -1,0 +1,103 @@
+# .bashrc
+
+# Source global definitions
+#if [ -f /etc/bashrc ]; then
+#	. /etc/bashrc
+#fi
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+# By Stefan Midjich
+
+# aliases
+alias h="history 25"
+alias j="jobs -l"
+alias tma="tmux attach -t"
+alias tmn="tmux new -s"
+alias tmd="tmux detach -s"
+alias tml="tmux ls"
+
+export SYSTEMD_PAGER=''
+export AUTOSSH_PORT=0
+export SHELL=/bin/bash
+export TERM=screen-256color
+export EDITOR=vim
+export PAGER=less
+export BLOCKSIZE=K
+export PGSSLMODE=require
+export BASHRC=$HOME/.bashrc
+export GOPATH=$HOME/.golang
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH:$HOME/.golang/bin
+export TERMINAL="gnome-terminal"
+
+# prompts
+export PS1='[\u@\h \W](\!/$?)$ '
+#export PS2='?> '
+# This fixes an annoying thing with prompts not starting
+# from first column of line. This causes issues like 
+# lines being shifted and unusable after aborting 
+# running programs. 
+#export PS1="\[\033[G\]$PS1"
+
+# Autocomplete known ssh hosts
+if [[ -e $HOME/.ssh/config ]]; then
+  complete -W "$(grep -h '^Host ' $HOME/.ssh/config $HOME/.ssh/*.conf | sort -u | sed 's/^Host //')" ssh autossh
+fi
+
+# Functions below this line
+
+# Report RAM usage of a process
+function ram_usage() {
+  total=0
+  si_suffix='kB'
+  mem_type='Private'
+
+  if [ $EUID -ne 0 ]; then 
+    echo "Must be root" && exit 0
+  fi
+
+  pid=$(pidof "$1")
+  test -z "$pid" && return 1
+  test -n "$2" && type=$2
+
+  IFS=' '
+  for current_pid in $pid; do
+    while IFS=' ' read -r type usage suffix; do
+      ((total += usage))
+      test -n "$suffix" && si_suffix="$suffix"
+    done <<<$(grep ^"$mem_type" "/proc/$current_pid/smaps")
+  done
+
+  echo "$1 uses $total $si_suffix memory"
+}
+
+export ram_usage
+
+PATH=$PATH:$HOME/android-sdk-linux:$HOME/android-sdk-linux/tools
+PATH=$PATH:$HOME/bin:$HOME/.local/bin:$HOME/.npm/bin
+export PATH
+
+test -f $HOME/.gnupg/gpg-agent-wrapper && source $HOME/.gnupg/gpg-agent-wrapper
+test -x "$(which dircolors)" && eval $(dircolors $HOME/.bash/dircolors.256dark)
+
+# Override cd to read possible virtualenv profiles
+cd() {
+	venv_file='.venv_profile'
+	builtin cd "$@" || return
+  test -f "./$venv_file" && source "./$venv_file"
+}
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/stemid/google-cloud-sdk/path.bash.inc' ]; then source '/home/stemid/google-cloud-sdk/path.bash.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/stemid/google-cloud-sdk/completion.bash.inc' ]; then source '/home/stemid/google-cloud-sdk/completion.bash.inc'; fi
+
+PATH=$PATH:$HOME/.npm_packages/bin:./node_modules/.bin
+
+JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.3.7-1.fc29.x86_64
+PATH=$PATH:$JAVA_HOME/bin:/opt/gradle/gradle-5.4.1/bin
+export JAVA_HOME
+export PATH

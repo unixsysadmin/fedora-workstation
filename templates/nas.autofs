@@ -1,0 +1,1 @@
+/media/nas      /etc/auto.nas --timeout=150 --ghost
