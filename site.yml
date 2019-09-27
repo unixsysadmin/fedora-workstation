@@ -44,25 +44,13 @@
 
     directories:
       - path: "{{ home }}/src"
-        owner: "{{ username }}"
-        group: "{{ username }}"
-        mode: "0750"
       - path: /media/nas
         owner: root
         group: root
         mode: "0755"
       - path: "{{ home }}/Utveckling"
-        owner: "{{ username }}"
-        group: "{{ username }}"
-        mode: "0750"
       - path: "{{ home }}/.local/bin"
-        owner: "{{ username }}"
-        group: "{{ username }}"
-        mode: "0750"
       - path: "{{ home }}/src/rpmbuild"
-        owner: "{{ username }}"
-        group: "{{ username }}"
-        mode: "0750"
       - path: "{{ home }}/Bilder/Screenshots"
 
     repos:
