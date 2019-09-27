@@ -52,6 +52,7 @@
       - path: "{{ home }}/.local/bin"
       - path: "{{ home }}/src/rpmbuild"
       - path: "{{ home }}/Bilder/Screenshots"
+      - path: "{{ home }}/.vim/colors"
 
     repos:
       - src: https://github.com/Anthony25/gnome-terminal-colors-solarized
@@ -64,6 +65,8 @@
         dest: "{{ home }}/src/gnome-shell-screenshot"
       - src: https://github.com/drahnr/signal-desktop-rpm
         dest: "{{ home }}/src/signal-desktop-rpm"
+      - src: https://github.com/lifepillar/vim-solarized8
+        dest: "{{ home }}/src/vim-solarized8"
 
     files:
       - src: tmux.conf

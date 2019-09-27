@@ -38,3 +38,14 @@
   ignore_errors: True
   register: signal_build
   when: build_signal
+
+- name: install vim-solarized8 colorscheme
+  file:
+    src: "{{ home }}/src/vim-solarized8/colors/{{ item }}"
+    dest: "{{ home }}/.vim/colors/{{ item }}"
+    state: link
+  with_items:
+    - solarized8.vim
+    - solarized8_flat.vim
+    - solarized8_high.vim
+    - solarized8_low.vim
