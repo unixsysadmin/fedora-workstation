@@ -1,0 +1,12 @@
+# Fuck you Ansible, I don't understand why this suddenly is required.
+# I was using ansible 2.8.2 for a whole day without any issue, and suddenly
+# on day 2 I get the error that python2-dnf is not available. An old
+# dperecated package on Fedora 30. 
+# https://github.com/ansible/ansible/issues/54855
+# WHY DID THIS WORK BEFORE THEN?!
+# AND IT IS NOT SOLVED IN 2.8
+# SO NOW I NEED THIS STUPID DIRECTORY IN ALL MY PLAYBOOKS?
+# FUUUUUUUUUUUUUUUUUUUUUUUUUU
+
+ansible_python_interpreter: /usr/bin/python3
+

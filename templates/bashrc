@@ -101,3 +101,10 @@ JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.3.7-1.fc29.x86_64
 PATH=$PATH:$JAVA_HOME/bin:/opt/gradle/gradle-5.4.1/bin
 export JAVA_HOME
 export PATH
+
+# Stops bash from saving commands with a leading whitepsace in history
+export HISTCONTROL="ignoreboth"
+
+# This stops a security risk with lesspipe
+unset LESSOPEN
+unset LESSCLOSE

@@ -1,0 +1,40 @@
+- name: install gnome-shell-screenshot
+  command: make install
+  args:
+    chdir: "{{ home }}/src/gnome-shell-screenshot"
+    creates: /home/stemid/.local/share/gnome-shell/extensions/gnome-shell-screenshot@ttll.de
+  ignore_errors: True
+
+- name: install yarn repo
+  template:
+    src: yarn.repo
+    dest: /etc/yum.repos.d/yarn.repo
+  become: True
+  tags: become-task
+
+- name: install build dependencies for Signal-Desktop
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - bsdtar
+    - gcc-c++
+    - openssl-devel
+    - yarn
+    - python2
+  become: True
+  tags: become-task
+
+- name: fetch signal tarball
+  get_url:
+    url: "{{ signal_tarball_url }}"
+    dest: "{{ home }}/src/rpmbuild/SOURCES/v{{ signal_version }}.tar.gz"
+
+- name: build Signal-Desktop
+  command: rpmbuild -bb SPECS/signal-desktop.spec
+  args:
+    chdir: "{{ home }}/src/rpmbuild"
+    creates: "{{ home }}/src/rpmbuild/RPMS/x86_64/signal-desktop-{{ signal_version }}-0.fc30.x86_64.rpm"
+  ignore_errors: True
+  register: signal_build
+  when: build_signal

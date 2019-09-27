@@ -1,7 +1,6 @@
 ---
 
 - hosts: all
-  become: True
 
   handlers:
     - include: handlers/main.yml
@@ -12,6 +11,10 @@
 
     backup_username: backup
     backup_password: secret.
+
+    build_signal: False
+    signal_version: 1.27.3
+    signal_tarball_url: "https://github.com/signalapp/Signal-Desktop/archive/v{{ signal_version }}.tar.gz"
 
     packages:
       - tmux
@@ -30,6 +33,14 @@
       - cifs-utils
       - redis
       - ansible
+      - rpm-build
+      - jq
+      - nodejs
+      - '@Development Tools'
+      - smartmontools
+      - lshw
+      - gnupg2
+      - pass
 
     directories:
       - path: "{{ home }}/src"
@@ -40,14 +51,33 @@
         owner: root
         group: root
         mode: "0755"
+      - path: "{{ home }}/Utveckling"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0750"
+      - path: "{{ home }}/.local/bin"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0750"
+      - path: "{{ home }}/src/rpmbuild"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0750"
+      - path: "{{ home }}/Bilder/Screenshots"
 
     repos:
       - src: https://github.com/Anthony25/gnome-terminal-colors-solarized
         dest: "{{ home }}/src/gnome-terminal-colors-solarized"
       - src: https://github.com/tmux-plugins/tmux-resurrect.git
-        dest: "{{ home }}/src/tmux-resurrect.git"
+        dest: "{{ home }}/src/tmux-resurrect"
+      - src: https://github.com/signalapp/Signal-Desktop.git
+        dest: "{{ home }}/src/Signal-Desktop"
+      - src: https://github.com/OttoAllmendinger/gnome-shell-screenshot.git
+        dest: "{{ home }}/src/gnome-shell-screenshot"
+      - src: https://github.com/drahnr/signal-desktop-rpm
+        dest: "{{ home }}/src/signal-desktop-rpm"
 
-    config_files:
+    files:
       - src: tmux.conf
         dest: "{{ home }}/.tmux.conf"
       - src: vimrc
@@ -56,6 +86,13 @@
         dest: "{{ home }}/.ansible.cfg"
       - src: bashrc
         dest: "{{ home }}/.bashrc"
+      - src: rpmmacros
+        dest: "{{ home }}/.rpmmacros"
+      - src: signal-desktop.spec
+        dest: "{{ home }}/src/rpmbuild/SPECS/signal-desktop.spec"
+      - src: screenshot.sh
+        dest: "{{ home }}/.local/bin/screenshot.sh"
+        mode: "0750"
 
   vars_files:
     - "vars/{{ fedora_environment | default('default') }}.yml"
@@ -66,25 +103,40 @@
         name: "{{ item }}"
         state: present
       with_items: "{{ packages }}"
+      become: True
+      tags: become-task
 
     - name: create directories
       file:
         path: "{{ item.path }}"
         state: directory
-        owner: "{{ item.owner }}"
-        group: "{{ item.group }}"
-        mode: "{{ item.mode }}"
+        owner: "{{ item.owner | default(username) }}"
+        group: "{{ item.group | default(username) }}"
+        mode: "{{ item.mode | default('0750') }}"
       with_items: "{{ directories }}"
+      become: True
+      tags: become-task
 
-    - include: tasks/setup-autofs.yml
+    - name: create rpmbuild directories
+      file:
+        path: "{{ home }}/src/rpmbuild/{{ item }}"
+        state: directory
+        mode: "0750"
+      with_items:
+        - SPECS
+        - SOURCES
+        - SRPMS
+        - tmp
+        - BUILDROOT
+        - RPMS
+        - BUILD
 
-    - name: install config files
+    - name: install files
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
-        owner: "{{ username }}"
-        group: "{{ username }}"
-      with_items: "{{ config_files }}"
+        mode: "{{ item.mode | default('0600') }}"
+      with_items: "{{ files }}"
 
     - name: clone git repos
       git:
@@ -93,16 +145,13 @@
         accept_hostkey: yes
       with_items: "{{ repos }}"
 
-    - name: reset permissions on git repos
-      file:
-        path: "{{ item.dest }}"
-        state: directory
-        owner: "{{ username }}"
-        group: "{{ username }}"
-      with_items: "{{ repos }}"
-
     - name: ensure redis is started
       service:
         name: redis
         state: started
         enabled: yes
+      become: True
+      tags: become-task
+
+    - include: tasks/run-commands.yml
+    - include: tasks/setup-autofs.yml

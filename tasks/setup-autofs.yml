@@ -8,6 +8,8 @@
     - src: nas.autofs
       dest: /etc/auto.master.d/nas.autofs
   notify: restart autofs
+  become: True
+  tags: become-task
 
 - name: install autofs nas credentials
   template:
@@ -15,4 +17,6 @@
     dest: /etc/nas.backups.creds
     mode: 0600
   notify: restart autofs
+  become: True
+  tags: become-task
 
