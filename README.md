@@ -6,7 +6,8 @@ This is what I run after I've installed a new Fedora workstation for myself.
 
     ansible-playbook -i inventory/hosts.myenv site.yml
 
-Add arguments like ``--vault-id`` and ``-K`` as necessary.
+* Add arguments like ``--vault-id`` and ``-K`` as necessary.
+* Use ``--skip-tags become-task`` to avoid all tasks that require sudo.
 
 ## Config
 
