@@ -16,6 +16,7 @@
     signal_version: 1.27.3
     signal_tarball_url: "https://github.com/signalapp/Signal-Desktop/archive/v{{ signal_version }}.tar.gz"
 
+    # Packages to install
     packages:
       - tmux
       - nmap
@@ -42,6 +43,7 @@
       - gnupg2
       - pass
 
+    # Directories to create
     directories:
       - path: "{{ home }}/src"
       - path: /media/nas
@@ -54,6 +56,7 @@
       - path: "{{ home }}/Bilder/Screenshots"
       - path: "{{ home }}/.vim/colors"
 
+    # Git repos to clone into ~/src
     repos:
       - src: https://github.com/Anthony25/gnome-terminal-colors-solarized
         dest: "{{ home }}/src/gnome-terminal-colors-solarized"
@@ -68,6 +71,7 @@
       - src: https://github.com/lifepillar/vim-solarized8
         dest: "{{ home }}/src/vim-solarized8"
 
+    # Files to transfer
     files:
       - src: tmux.conf
         dest: "{{ home }}/.tmux.conf"
@@ -85,6 +89,7 @@
         dest: "{{ home }}/.local/bin/screenshot.sh"
         mode: "0750"
 
+  # Override values
   vars_files:
     - "vars/{{ fedora_environment | default('default') }}.yml"
 
