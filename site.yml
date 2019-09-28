@@ -42,6 +42,7 @@
       - lshw
       - gnupg2
       - pass
+      - irssi
 
     # Directories to create
     directories:
@@ -55,6 +56,7 @@
       - path: "{{ home }}/src/rpmbuild"
       - path: "{{ home }}/Bilder/Screenshots"
       - path: "{{ home }}/.vim/colors"
+      - path: "{{ home }}/.config/systemd/user"
 
     # Git repos to clone into ~/src
     repos:
@@ -88,6 +90,8 @@
       - src: screenshot.sh
         dest: "{{ home }}/.local/bin/screenshot.sh"
         mode: "0750"
+      - src: autossh@.service
+        dest: "{{ home }}/.config/systemd/user/autossh@.service"
 
   # Override values
   vars_files:
@@ -148,6 +152,12 @@
         enabled: yes
       become: True
       tags: become-task
+
+    - name: run systemctl daemon-reload
+      systemd:
+        name: autossh@.service
+        daemon_reload: yes
+        scope: user
 
     - include: tasks/run-commands.yml
     - include: tasks/setup-autofs.yml
