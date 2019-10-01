@@ -1,0 +1,3 @@
+- src: https://gitlab.com/stemid-ansible/rpmfusion_repo.git
+  scm: git
+  name: rpmfusion_repo

@@ -2,6 +2,10 @@
 
 This is what I run after I've installed a new Fedora workstation for myself.
 
+# Install role
+
+    ansible-galaxy install -r requirements.yml
+
 # Run
 
     ansible-playbook -i inventory/hosts.myenv site.yml
