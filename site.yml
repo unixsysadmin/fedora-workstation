@@ -43,6 +43,7 @@
       - gnupg2
       - pass
       - irssi
+      - '@Multimedia'
 
     # Directories to create
     directories:
@@ -57,6 +58,8 @@
       - path: "{{ home }}/Bilder/Screenshots"
       - path: "{{ home }}/.vim/colors"
       - path: "{{ home }}/.config/systemd/user"
+      - path: "{{ home }}/Ansible/playbooks"
+      - path: "{{ home }}/Ansible/roles"
 
     # Git repos to clone into ~/src
     repos:
@@ -93,16 +96,22 @@
       - src: autossh@.service
         dest: "{{ home }}/.config/systemd/user/autossh@.service"
 
+    ssh_tunnels: []
+
   # Override values
   vars_files:
     - "vars/{{ fedora_environment | default('default') }}.yml"
 
+  roles:
+    - role: rpmfusion_repo
+      distro_version: 30
+      tags: become-task
+
   tasks:
     - name: install packages
       package:
-        name: "{{ item }}"
+        name: "{{ packages }}"
         state: present
-      with_items: "{{ packages }}"
       become: True
       tags: become-task
 
@@ -158,6 +167,14 @@
         name: autossh@.service
         daemon_reload: yes
         scope: user
+
+    - name: start ssh tunnels
+      systemd:
+        name: "autossh@{{ item }}.service"
+        state: started
+        enabled: yes
+        scope: user
+      with_items: "{{ ssh_tunnels }}"
 
     - include: tasks/run-commands.yml
     - include: tasks/setup-autofs.yml
