@@ -44,6 +44,9 @@
       - pass
       - irssi
       - '@Multimedia'
+      - python3-redis
+      - perl-libwww-perl
+      - htop
 
     # Directories to create
     directories:
@@ -60,6 +63,7 @@
       - path: "{{ home }}/.config/systemd/user"
       - path: "{{ home }}/Ansible/playbooks"
       - path: "{{ home }}/Ansible/roles"
+      - path: "{{ home }}/.vim/pack/plugins/start"
 
     # Git repos to clone into ~/src
     repos:
@@ -75,6 +79,10 @@
         dest: "{{ home }}/src/signal-desktop-rpm"
       - src: https://github.com/lifepillar/vim-solarized8
         dest: "{{ home }}/src/vim-solarized8"
+      - src: https://github.com/gcmt/taboo.vim.git
+        dest: "{{ home }}/src/taboo.vim"
+      - src: https://github.com/vim-scripts/indentpython.vim
+        dest: "{{ home }}/src/indentpython.vim"
 
     # Files to transfer
     files:
@@ -95,6 +103,11 @@
         mode: "0750"
       - src: autossh@.service
         dest: "{{ home }}/.config/systemd/user/autossh@.service"
+
+    # Git repos of vim plugins that will be symlinked under {{ home }}/.vim
+    vim_packages:
+      - taboo.vim
+      - indentpython.vim
 
     ssh_tunnels: []
 
@@ -175,6 +188,24 @@
         enabled: yes
         scope: user
       with_items: "{{ ssh_tunnels }}"
+
+    - name: install vim-solarized8 colorscheme
+      file:
+        src: "{{ home }}/src/vim-solarized8/colors/{{ item }}"
+        dest: "{{ home }}/.vim/colors/{{ item }}"
+        state: link
+      with_items:
+        - solarized8.vim
+        - solarized8_flat.vim
+        - solarized8_high.vim
+        - solarized8_low.vim
+
+    - name: install vim packages
+      file:
+        src: "{{ home }}/src/{{ item }}"
+        dest: "{{ home }}/.vim/pack/plugins/start/{{ item }}"
+        state: link
+      with_items: "{{ vim_packages }}"
 
     - include: tasks/run-commands.yml
     - include: tasks/setup-autofs.yml
