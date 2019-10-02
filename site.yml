@@ -207,5 +207,14 @@
         state: link
       with_items: "{{ vim_packages }}"
 
+    - name: reduce swapping to NVME disk
+      sysctl:
+        name: vm.swappiness
+        value: 10
+        state: present
+        sysctl_file: /etc/sysctl.d/10-swappiness.conf
+      become: True
+      tags: become-task
+
     - include: tasks/run-commands.yml
     - include: tasks/setup-autofs.yml
