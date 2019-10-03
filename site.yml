@@ -64,7 +64,7 @@
       - path: "{{ home }}/Ansible/playbooks"
       - path: "{{ home }}/Ansible/roles"
       - path: "{{ home }}/.vim/pack/plugins/start"
-      - path: "{{ home }}/.tmuxp"
+      - path: "{{ home }}/.bash"
 
     # Git repos to clone into ~/src
     repos:
@@ -104,6 +104,8 @@
         mode: "0750"
       - src: autossh@.service
         dest: "{{ home }}/.config/systemd/user/autossh@.service"
+      - src: dircolors.256dark
+        dest: "{{ home }}/.bash/dircolors.256dark"
 
     # Git repos of vim plugins that will be symlinked under {{ home }}/.vim
     vim_packages:
@@ -207,15 +209,6 @@
         dest: "{{ home }}/.vim/pack/plugins/start/{{ item }}"
         state: link
       with_items: "{{ vim_packages }}"
-
-    - name: reduce swapping to NVME disk
-      sysctl:
-        name: vm.swappiness
-        value: 10
-        state: present
-        sysctl_file: /etc/sysctl.d/10-swappiness.conf
-      become: True
-      tags: become-task
 
     - include: tasks/run-commands.yml
     - include: tasks/setup-autofs.yml
