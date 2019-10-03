@@ -64,6 +64,7 @@
       - path: "{{ home }}/Ansible/playbooks"
       - path: "{{ home }}/Ansible/roles"
       - path: "{{ home }}/.vim/pack/plugins/start"
+      - path: "{{ home }}/.tmuxp"
 
     # Git repos to clone into ~/src
     repos:
