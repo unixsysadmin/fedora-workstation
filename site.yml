@@ -47,6 +47,7 @@
       - python3-redis
       - perl-libwww-perl
       - htop
+      - selinux-policy-devel
 
     # Directories to create
     directories:
