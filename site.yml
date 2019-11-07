@@ -121,7 +121,6 @@
 
   roles:
     - role: rpmfusion_repo
-      distro_version: 30
       tags: become-task
 
   tasks:
