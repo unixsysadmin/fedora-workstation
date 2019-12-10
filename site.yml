@@ -38,6 +38,7 @@
       - jq
       - nodejs
       - '@Development Tools'
+      - git-core
       - smartmontools
       - lshw
       - gnupg2
